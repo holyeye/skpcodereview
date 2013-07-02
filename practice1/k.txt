@@ -1,0 +1,10 @@
+private CheckInResult CheckInSaveList() throws UnsupportedEncodingException {
+	ArrayList<BasicNameValuePair> param = new ArrayList<BasicNameValuePair>();
+	param.add(new BasicNameValuePair("code","getPoint")); 
+	param.add(new BasicNameValuePair("MBRID",URLDecoder.decode("J3MvWf%2BPRMwDbvls5HSNEQ%3D%3D", "UTF-8")));
+	CheckInResult checkInResult = exLinkage.doInterFace(ExApiList.CheckIn_SaveList, param, CheckInResult.class);
+	LOGGER.debug("------------CheckInSaveList() START-------------");
+	LOGGER.debug(checkInResult.toString());
+	LOGGER.debug("------------CheckInSaveList() END-------------");
+	return checkInResult;
+}	

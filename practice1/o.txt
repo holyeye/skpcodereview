@@ -1,0 +1,58 @@
+        try{
+            System.out.println("##shopId = " + shopId + ", memberId = " + memberId);
+        	
+        	// type => NB:구매태깅 미가입(포인트 적립 화면 분기시 필요함), C:명함이벤트 응모하기 주변혜택에서 넘어옴
+        	
+        	//GateWay에서 설정한 shopId 쿠키값 확인 테스트 
+        	String cookieShopId = getValueCookie(request, response, "cookieShopid");
+        	LOGGER.debug("[LandingController :: callLanding] cookieShopId : " + cookieShopId);
+        	
+        	String joinType = "LANDING";
+        	String taggingFlag = "N";
+        	if ("C".equals(type)) {
+        		type = "";
+        	} else {
+        		if (cookieShopId.equals(shopId)) {
+            		taggingFlag = "Y";
+            	}
+        	}
+        	     	
+        	/* 테스트용임
+        	 * 실제론 shopId를 받아서 poiId 조회 처리
+        	 */
+        	/*
+        	if (memberId == null && shopId == null) {
+        		memberId = "700";
+        		shopId = "62";
+        		//shopId = "2781759";
+        	}
+        	*/
+        	
+        	/**********************************************************************/
+        	/** shopid로 shop 정보 조회
+        	/**********************************************************************/
+        	Shop retShop = shopService.selectShopInfoById(shopId);
+        	String poiId = "";
+        	String shopNm = "";
+        	if (retShop != null) {
+        		poiId = retShop.getPoiId();
+        		shopNm = retShop.getName();
+        	}
+        	
+        	
+        	ModelAndView mav = new ModelAndView("landing/landing");
+        	mav.addObject("shopId", shopId);
+        	mav.addObject("memberId", memberId);
+        	mav.addObject("poiId", poiId); // poi id
+        	mav.addObject("shopNm", shopNm); // 샵 이름
+        	
+        	mav.addObject("joinType", joinType);
+        	mav.addObject("taggingFlag", taggingFlag);
+        	
+        	mav.addObject("type", type); // type => NB:구매태깅 미가입(포인트 적립 화면 분기시 필요함)
+        	
+            return mav;
+        } catch (Exception e) {
+            LOGGER.error("랜딩 페이지 호출시에 문제가 발생하였습니다. ::: "+e.toString());
+            throw new CommonException("랜딩 페이지 호출시에 문제가 발생하였습니다."); 
+        }

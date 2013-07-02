@@ -1,0 +1,8 @@
+long useTime = USING_HOUR * 60 * 60;
+
+long elapse  = (cal2.getTimeInMillis() - cal.getTimeInMillis()) / 1000;
+if (elapse > useTime) {
+	return false;			
+} else {
+	return true;
+}	

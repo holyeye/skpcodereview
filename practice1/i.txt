@@ -1,0 +1,45 @@
+static public class MapApi {
+    Object pageStart;
+    Object pageSize;
+    Object PageTotalCnt;
+    Object list;
+
+
+    public Object getPageStart() {
+        return pageStart;
+    }
+    public void setPageStart(Object pageStart) {
+        this.pageStart = pageStart;
+    }
+    public Object getPageSize() {
+        return pageSize;
+    }
+    public void setPageSize(Object pageSize) {
+        this.pageSize = pageSize;
+    }
+    public Object getPageTotalCnt() {
+        return PageTotalCnt;
+    }
+    public void setPageTotalCnt(Object pageTotalCnt) {
+        PageTotalCnt = pageTotalCnt;
+    }
+    public Object getList() {
+        return list;
+    }
+    public void setList(Object list) {
+        this.list = list;
+    }
+    
+    public MapApi(Object pageStart, Object pageSize,Object PageTotalCnt, Object list) {
+        super();
+        this.pageStart = pageStart;
+        this.pageSize = pageSize;
+        this.PageTotalCnt = PageTotalCnt;
+        this.list = list;
+    }
+    
+    public MapApi() {
+        super();
+    }
+    
+}  

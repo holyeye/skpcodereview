@@ -1,0 +1,34 @@
+public Member insertMBMemberMBR(Member mbMember) {
+	// memberId에 해당하는 member 정보 조회
+	Member checkMember = memberMapper.selectMemberMbrByMemberId(mbMember.getMemberId());
+	
+	if (checkMember == null) {
+		// MB_MEMBER_MBR 테이블 정보 등록
+		int mbrSeq = memberMapper.insertMBMemberMBR(mbMember);
+		
+		if (mbrSeq > 0) {
+			// mbrId와 ocbCardNo로 등록된 가장 최근의 mbrId 정보 조회
+			List<Member> mbrList = new ArrayList<Member>();
+			mbrList = memberMapper.selectMemberMbrForOcbCardRegist(mbMember);
+			String mbrId = "";
+			String memberMbrId = "";
+			if (mbrList != null && mbrList.size() > 0) {
+				//memberMbrId = mbrList.get(mbrList.size() - 1).getMemberMbrId();
+				//mbrId = mbrList.get(mbrList.size() - 1).getMbrId();
+				memberMbrId = mbrList.get(0).getMemberMbrId();
+				mbrId = mbrList.get(0).getMbrId();
+			}
+			
+			// MB_MEMBER_MAPPING 테이블 정보 등록
+			checkMember = new Member();
+			checkMember.setMemberId(mbMember.getMemberId());
+			checkMember.setMemberXXId(memberMbrId);
+			checkMember.setMappingTableNm("MB_MEMBER_MBR");
+			memberMapper.insertMBMemberMapping(checkMember);
+		
+			checkMember.setMemberMbrId(memberMbrId);
+		}
+	}
+	
+	return checkMember;
+}

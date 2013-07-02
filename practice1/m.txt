@@ -1,0 +1,38 @@
+    public ApiWrapper cardEntry(
+            @RequestParam( value="phoneNo", required=false ) String phoneNo,
+            @RequestParam( value="shopId", required=false ) String shopId,
+            @RequestParam( value="eventId", required=false ) String eventId,
+            @RequestParam( value="memberId", required=false) String memberId,
+            @RequestParam( value="joinType", required=false ) String joinType,
+            @RequestParam( value="taggingFlag", required=false ) String taggingFlag,
+            @RequestParam( value="name", required=false ) String name,
+            @RequestParam( value="birthday", required=false ) String birthday,
+            @RequestParam( value="sex", required=false ) String sex
+            ) throws Exception {
+        
+        try {
+            ActivityLog activityLog = new ActivityLog();
+            activityLog.setMemberId(memberId);
+            activityLog.setShopId(shopId);
+            activityLog.setUrl("/card/cardEntry");
+            activityLog.setText("명함 응모 완료 ");
+            
+            activityLogService.insert(activityLog);
+        } catch (Exception e) {
+            logger.debug("ActivityLog 로그 저장 실 패!!!");
+        }
+        
+        /* 인증완료 휴대폰 번호 '-' 추가*/
+        if( phoneNo.length() > 10 ){ // 010 1234 5678
+            
+            phoneNo = phoneNo.substring(0, 3)+"-"+phoneNo.substring(3, 7)+"-"+phoneNo.substring(7, 11);
+        }else{ // 010 123 4567
+            phoneNo = phoneNo.substring(0, 3)+"-"+phoneNo.substring(3, 6)+"-"+phoneNo.substring(7, 10);
+        }
+        
+        logger.info("================ phone number : ["+phoneNo+"] ====================");
+        logger.info("================ shopId : ["+shopId+"] ====================");
+        logger.info("================eventId : ["+eventId+"] ====================");
+        logger.info("================ memberId  : ["+memberId+"] ====================");
+        logger.info("================ joinType : ["+joinType+"] ====================");
+        logger.info("================ joinType : ["+taggingFlag+"] ====================");

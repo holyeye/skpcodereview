@@ -1,0 +1,8 @@
+// getType으로 응답결과 비교 response : 정상 / error : 에러 -> getCode(), getMessage 사용		
+if ("response".equals(result.getType())) {
+	//ret.put("sumPoint", result.getSavePoint());
+	shoptalkPoint = Integer.parseInt(result.getSavePoint());
+} else {
+	//ret.put("code", result.getCode());
+	//ret.put("message", result.getMessage());
+}

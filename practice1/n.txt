@@ -1,0 +1,16 @@
+@RequestMapping(value="/memberMbrClear", method=RequestMethod.GET)
+public ApiWrapper memberMbrClear(
+        @RequestParam(value="memberId") String memberId,
+        @RequestParam(value="memberMbrId") String memberMbrId ) {
+    System.out.println("==========================");
+    System.out.println("==========================");
+    System.out.println("==========================");
+    System.out.println("==========================");
+    System.out.println("TestController.memberMbrClear()");
+    System.out.println(memberId);
+    System.out.println(memberMbrId);
+    
+    testService.memberMbrClear(memberMbrId);
+    
+    return new ApiWrapper(); 
+}

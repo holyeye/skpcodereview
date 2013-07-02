@@ -1,0 +1,11 @@
+try {
+    ActivityLog activityLog = new ActivityLog();
+    activityLog.setMemberId(Long.toString(member.getId()));
+    activityLog.setShopId(retShop.getId());
+    activityLog.setUrl("/admin/eventEntry");
+    activityLog.setText("관리자 페이지(이벤트)");
+    
+    activityLogService.insert(activityLog);
+} catch (Exception e) {
+    logger.debug("ActivityLog 로그 저장 실 패!!!");
+}	

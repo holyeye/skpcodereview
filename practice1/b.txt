@@ -1,0 +1,12 @@
+@Override
+public synchronized JAXBContext getJaxbContext() {
+
+	// if ( packagesToScan.length > 0) {
+	// // We will try *my* way :-)
+	// final List<Class<?>> annotatedClasses = scanPackages();
+	// if (annotatedClasses.size() > 0) {
+	// setClassesToBeBound(annotatedClasses.toArray(new Class<?>[0]));
+	// }
+	// }
+	return super.getJaxbContext();
+}

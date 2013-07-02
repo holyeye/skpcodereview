@@ -1,0 +1,29 @@
+protected List<Class<?>> scanPackages() {
+	final List<Class<?>> annotatedClasses = new ArrayList<Class<?>>();
+	
+	try {
+		if (packagesToScan != null) {
+			for (final String pkg : packagesToScan) {
+				final String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+						+ ClassUtils.convertClassNameToResourcePath(pkg) + RESOURCE_PATTERN;
+				final Resource[] resources = resourcePatternResolver.getResources(pattern);
+				final MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
+						resourcePatternResolver);
+				for (final Resource resource : resources) {
+					final MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+					final String className = metadataReader.getClassMetadata().getClassName();
+					if (matchesFilter(metadataReader, metadataReaderFactory)) {
+						final Class<?> jaxb2AnnotatedClass = resourcePatternResolver.getClassLoader().loadClass(
+								className);
+						annotatedClasses.add(jaxb2AnnotatedClass);
+					}
+				}
+			}
+		}
+	} catch (final IOException ex) {
+		throw new UncategorizedMappingException("Failed to scan classpath for unlisted classes", ex);
+	} catch (final ClassNotFoundException ex) {
+		throw new UncategorizedMappingException("Failed to load annotated classes from classpath", ex);
+	}
+	return annotatedClasses;
+}

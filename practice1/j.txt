@@ -1,0 +1,27 @@
+public String createCertParam(String plusInfoData) {
+	// 아래는 옵션값들.. 햔재 사용하지 않는다
+	 String name = "";        // 성명
+	 String phoneNo = "";	    // 휴대폰번호
+	 String phoneCorp = "";	// 이통사 타입
+	 String birthDay = "";	// 생년월일
+	 String gender = "";		// 성별
+	 String nation = "";      // 내외국인 구분
+	 String plusInfo = plusInfoData;	// 추가DATA정보
+	 String extendVar = "0000000000000000";// 확장변수
+	
+	IcertSecuManager seed  = new IcertSecuManager();
+	
+	String tr_cert = cpId +"/"+ urlCode +"/"+ getReqNum() +"/"+ getReqDate() +"/"+ certMet +"/"+ birthDay +"/"+ gender +"/"+ name +"/"+ phoneNo +"/"+ phoneCorp +"/"+ nation +"/"+ plusInfo +"/"+ extendVar;
+	
+	//1차 암호화 (tr_cert 데이터변수 조합 후 암호화)
+	String enc_tr_cert = seed.getEnc(tr_cert, "");
+	
+	//1차 암호화 데이터에 대한 위변조 검증값 생성 (HMAC)
+	String hmacMsg = "";
+	hmacMsg = seed.getMsg(enc_tr_cert);
+
+	//2차 암호화 (1차 암호화 데이터, HMAC 데이터, extendVar 조합 후 암호화)
+	tr_cert  = seed.getEnc(enc_tr_cert + "/" + hmacMsg + "/" + extendVar, "");
+
+	return tr_cert;	
+}

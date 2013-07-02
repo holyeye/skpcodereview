@@ -1,0 +1,122 @@
+@RequestMapping(value="/cardEntry", method=GET)
+public ApiWrapper cardEntry(
+        @RequestParam( value="phoneNo", required=false ) String phoneNo,
+        @RequestParam( value="shopId", required=false ) String shopId,
+        @RequestParam( value="eventId", required=false ) String eventId,
+        @RequestParam( value="memberId", required=false) String memberId,
+        @RequestParam( value="joinType", required=false ) String joinType,
+        @RequestParam( value="taggingFlag", required=false ) String taggingFlag,
+        @RequestParam( value="name", required=false ) String name,
+        @RequestParam( value="birthday", required=false ) String birthday,
+        @RequestParam( value="sex", required=false ) String sex
+        ) throws Exception {
+    
+    try {
+        ActivityLog activityLog = new ActivityLog();
+        activityLog.setMemberId(memberId);
+        activityLog.setShopId(shopId);
+        activityLog.setUrl("/card/cardEntry");
+        activityLog.setText("명함 응모 완료 ");
+        
+        activityLogService.insert(activityLog);
+    } catch (Exception e) {
+        logger.debug("ActivityLog 로그 저장 실 패!!!");
+    }
+    
+    /* 인증완료 휴대폰 번호 '-' 추가*/
+    if( phoneNo.length() > 10 ){ // 010 1234 5678
+        
+        phoneNo = phoneNo.substring(0, 3)+"-"+phoneNo.substring(3, 7)+"-"+phoneNo.substring(7, 11);
+    }else{ // 010 123 4567
+        phoneNo = phoneNo.substring(0, 3)+"-"+phoneNo.substring(3, 6)+"-"+phoneNo.substring(7, 10);
+    }
+    
+    logger.info("================ phone number : ["+phoneNo+"] ====================");
+    logger.info("================ shopId : ["+shopId+"] ====================");
+    logger.info("================eventId : ["+eventId+"] ====================");
+    logger.info("================ memberId  : ["+memberId+"] ====================");
+    logger.info("================ joinType : ["+joinType+"] ====================");
+    logger.info("================ joinType : ["+taggingFlag+"] ====================");
+   
+    //응모 이력 확인 - 핸드폰 번호 검색
+    Member mbMember = null; 
+    mbMember = cardService.selectMemberHPByPhoneNo( phoneNo );  
+    
+    //DB insert를 위한 MB_Member
+    Member mbMemberDB = new Member();
+    
+    int memberHpResult = 0;
+    int memberMappingResult = 0;
+    int eventResult = 0;
+    
+    //Member HP Seq Search
+    Member memberHpSeq = cardService.selectMemberHPByPhoneNo( phoneNo );
+            
+    if( mbMember == null || "".equals( mbMember ) ){ // 명함이벤트 응모 이력이 없는 경우
+        //MB_MEMBER_HP Insert
+        mbMemberDB.setPhoneNo( phoneNo );   
+        mbMemberDB.setName( name );
+        mbMemberDB.setBirthday( birthday );
+        mbMemberDB.setSex( sex );
+        memberHpResult = cardService.insertMBMemberHP( mbMemberDB );
+        
+        /* 등록 된 핸드폰 번호의 seq 검색 */
+        memberHpSeq = cardService.selectMemberHPByPhoneNo( phoneNo );
+        
+        logger.info("================ Card Event No Entry "+ memberHpResult+" ====================");
+        
+        
+        if( memberHpResult > 0 ){ // 핸드폰 테이블 insert 성공시
+            //MB_MEMBER_MAPPNG Insert
+            mbMemberDB.setMemberId( memberId );
+            mbMemberDB.setMemberXXId( memberHpSeq.getMemberHpId() );
+            mbMemberDB.setMappingTableNm( "MB_MEMBER_HP" );            
+            
+            memberMappingResult = cardService.insertMBMemberMapping( mbMemberDB );
+            
+        }
+        
+    }else{ // 명함이벤트 응모 이력이 있는 경우.
+        
+        logger.info("================ Card Event Entry ====================");
+        
+        /* 매핑테이블 select로 memberId 변경여부 확인. 또는 존재여부 확인.*/
+        mbMemberDB.setMemberId( memberId );
+        mbMemberDB.setMemberXXId( memberHpSeq.getMemberHpId() );
+        mbMemberDB.setMappingTableNm( "MB_MEMBER_HP" );            
+        
+        List<Member> mappingList = cardService.selectMemberMapping( mbMemberDB );
+        
+        if( mappingList.size() < 1 ){// 새로운 MemberID가 생성 된 경우. 또는 MemberId가 없는 경우.
+            memberMappingResult = cardService.insertMBMemberMapping( mbMemberDB );
+        }else{
+            memberMappingResult = 1; 
+        }
+        
+    }
+    
+    
+    /* 멤버별 이벤트 응모 횟수 기록을 위한 INSERT */
+    EventMember evMember = new EventMember();
+    if( memberMappingResult > 0 ){
+        
+        logger.info("================ Card Event log Insert ====================");
+        evMember.setEventId( eventId );
+        evMember.setShopid( shopId );
+        evMember.setMemberId( memberId );
+        evMember.setJoinType( "LANDING" );
+        evMember.setTaggingFlag( taggingFlag );
+        
+        eventResult = cardService.insertEVEventMember( evMember );            
+    }
+    
+    
+    logger.info("================ Card Event log memberHpId : "+memberHpSeq.getMemberHpId()+" ====================");
+    
+    Map<String, Object> ret = new HashMap<String, Object>();
+    
+    ret.put( "insertResult", eventResult );
+    ret.put( "memberHpId", memberHpSeq.getMemberHpId() ); 
+    
+    return new ApiWrapper( ret );
+}

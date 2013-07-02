@@ -1,0 +1,18 @@
+private static double d2r = Math.PI / 180;
+
+public static double distance(double startPointLon, double startPointLat, double endPointLon, double endPointLat) throws Exception {
+    double dLon = (endPointLon - startPointLon) * d2r;
+    double dLat = (endPointLat - startPointLat) * d2r;
+
+    double a = Math.pow(Math.sin(dLat / 2.0), 2)
+                   + Math.cos(startPointLat * d2r)
+                   * Math.cos(endPointLat * d2r)
+                   * Math.pow(Math.sin(dLon / 2.0), 2);
+
+    double c = Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 2;
+
+    double distance = c * 6378;
+
+    return distance;
+
+}
